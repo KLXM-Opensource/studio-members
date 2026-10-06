@@ -139,4 +139,6 @@ return [
     'Änderung bestätigen' => 'Confirm change',
     'Änderung bestätigen – {site}' => 'Confirm change – {site}',
     'Öffentlich' => 'Public',
+    'Links & Social Media' => 'Links & social media',
+    'optional' => 'optional',
 ];

@@ -46,7 +46,11 @@ $mine = array_values(array_filter(array_map(fn($g) => $groups[$g] ?? null, $m['g
           foreach ($levels as $k => $l) $h .= '<option value="' . e($k) . '"' . (($vis[$name] ?? '') === $k ? ' selected' : '') . '>' . e($l) . '</option>';
           return $h . '</select></label>';
       };
+      $linksHead = false;
       foreach ($fields as $pf):
+          if ($pf['type'] === 'url' && !$linksHead): $linksHead = true; ?>
+      <h3 class="mb-sub"><?= e(lt('Links & Social Media')) ?> <small class="mb-hint"><?= e(lt('optional')) ?></small></h3>
+      <?php endif;
           $name = (string) $pf['name']; $id = 'mb-p-' . $name; $val = (string) ($m['profile'][$name] ?? ''); $err = $errors['p_' . $name] ?? null;
           $label = \Core\Data\Tables::label($pf); ?>
       <div class="mb-f mb-pf<?= $err ? ' mb-f--err' : '' ?>">
@@ -57,9 +61,9 @@ $mine = array_values(array_filter(array_map(fn($g) => $groups[$g] ?? null, $m['g
         <select id="<?= e($id) ?>" name="p[<?= e($name) ?>]"><option value=""></option>
           <?php foreach ((array) ($pf['options'] ?? []) as $ok => $ol): ?><option value="<?= e((string) $ok) ?>"<?= (string) $ok === $val ? ' selected' : '' ?>><?= e(\Core\Data\Tables::optionLabel($pf, (string) $ok)) ?></option><?php endforeach; ?></select>
         <?php else: ?>
-        <input id="<?= e($id) ?>" name="p[<?= e($name) ?>]" value="<?= e($val) ?>" type="<?= e(['url' => 'url', 'tel' => 'tel', 'email' => 'email', 'date' => 'date'][$pf['type']] ?? 'text') ?>"<?= $name === 'name' ? ' autocomplete="name" required' : '' ?>>
+        <input id="<?= e($id) ?>" name="p[<?= e($name) ?>]" value="<?= e($val) ?>" type="<?= e(['url' => 'url', 'tel' => 'tel', 'email' => 'email', 'date' => 'date'][$pf['type']] ?? 'text') ?>"<?= $name === 'name' ? ' autocomplete="name" required' : '' ?><?= $pf['type'] === 'url' && !empty($pf['help']) ? ' placeholder="' . e($pf['help']) . '" inputmode="url"' : '' ?>>
         <?php endif; ?>
-        <?php if (!empty($pf['help'])): ?><small class="mb-hint"><?= e($pf['help']) ?></small><?php endif; ?>
+        <?php if (!empty($pf['help']) && $pf['type'] !== 'url'): ?><small class="mb-hint"><?= e($pf['help']) ?></small><?php endif; ?>
         <?php if ($err): ?><small class="mb-err"><?= e($err) ?></small><?php endif; ?>
       </div>
       <?php endforeach; ?>

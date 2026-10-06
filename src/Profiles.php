@@ -27,10 +27,23 @@ final class Profiles
     }
 
     /** Tabelle der Profile – legt sie beim ersten Bedarf an (Name, E-Mail) */
+    /** Optionale Links des Profils (Website, Social Media) – Mitglieder pflegen sie selbst, je Feld mit Sichtbarkeit */
+    public const LINK_FIELDS = [
+        ['name' => 'website', 'label' => 'Website', 'type' => 'url', 'width' => 'half', 'help' => 'https://…'],
+        ['name' => 'linkedin', 'label' => 'LinkedIn', 'type' => 'url', 'width' => 'half', 'help' => 'https://www.linkedin.com/in/…'],
+        ['name' => 'instagram', 'label' => 'Instagram', 'type' => 'url', 'width' => 'half', 'help' => 'https://www.instagram.com/…'],
+        ['name' => 'facebook', 'label' => 'Facebook', 'type' => 'url', 'width' => 'half', 'help' => 'https://www.facebook.com/…'],
+        ['name' => 'mastodon', 'label' => 'Mastodon', 'type' => 'url', 'width' => 'half', 'help' => 'https://…/@name'],
+        ['name' => 'bluesky', 'label' => 'Bluesky', 'type' => 'url', 'width' => 'half', 'help' => 'https://bsky.app/profile/…'],
+    ];
+    /** Stand der Standardfelder – höher = fehlende Felder einmalig ergänzen (eigene Änderungen der Redaktion bleiben) */
+    private const FIELDS_VERSION = 2;
+
     public static function table(): array
     {
         if (self::$table !== null) return self::$table;
         $t = Tables::findContent(self::handle());
+        if ($t && (int) app()->settings->get('members.fields_version', 1) < self::FIELDS_VERSION) $t = self::addDefaultFields($t);
         if (!$t) {
             [$def, $errors] = Tables::validate([
                 'name' => 'Mitglieder', 'handle' => self::handle(), 'singular' => 'Mitglied', 'icon' => 'users',
@@ -39,6 +52,7 @@ final class Profiles
                     ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'in_list' => true, 'searchable' => true, 'width' => 'half'],
                     ['name' => 'email', 'label' => 'E-Mail', 'type' => 'email', 'required' => true, 'in_list' => true, 'searchable' => true, 'width' => 'half'],
                     ['name' => 'vita', 'label' => 'Kurze Vita', 'type' => 'textarea', 'help' => 'Ein paar Sätze über Sie – z. B. Funktion, Schwerpunkte, Kontaktwunsch.'],
+                    ...self::LINK_FIELDS,
                 ],
                 'settings' => ['kind' => 'content', 'route' => '', 'title_field' => 'name'],
             ]);
@@ -49,6 +63,26 @@ final class Profiles
             Repo::setTableRule((string) $t['handle'], []);   // geschützt: nur Mitglieder (z. B. Mitgliederverzeichnis auf geschützter Seite)
         }
         return self::$table = $t;
+    }
+
+    /** Fehlende Standardfelder (Links) an eine bestehende Tabelle anhängen – einmalig je Version, nichts wird entfernt */
+    private static function addDefaultFields(array $t): array
+    {
+        app()->settings->set('members.fields_version', self::FIELDS_VERSION);
+        $have = array_column($t['fields'], 'name');
+        $add = array_values(array_filter(self::LINK_FIELDS, fn($f) => !in_array($f['name'], $have, true)));
+        if (!$add) return $t;
+        try {
+            $in = Tables::toInput($t);
+            $in['fields'] = array_merge($in['fields'], $add);
+            [$def, $errors] = Tables::validate($in, $t);
+            if ($errors) throw new \RuntimeException(implode(' ', $errors));
+            Tables::update($t, $def);
+            return Tables::findContent((string) $t['handle']) ?? $t;
+        } catch (\Throwable $e) {
+            error_log('[members] Profilfelder ergänzen: ' . $e->getMessage());
+            return $t;
+        }
     }
 
     public static function reset(): void

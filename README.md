@@ -22,7 +22,7 @@ Aktivieren je Website unter **Administration → Funktionen & Erweiterungen** od
 | Anmeldung | `/mitglieder/anmelden`: Passkey, Passwort oder Anmelde-Link (15 Min., einmal). Sitzung getrennt von der Verwaltung (Mitglieder kommen nie in `/admin`). |
 | Einladungen & Anträge | Redaktion lädt ein (Link 14 Tage); optional „Zugang beantragen“ (`/mitglieder/zugang`) mit Freischaltung durch die Redaktion. |
 | Gruppen | z. B. Vorstand, Presse – für Seiten und Tabellen. |
-| Profile | Datentabelle „Mitglieder“ (Name, E-Mail, Kurze Vita + eigene Felder) – eine Datenbasis, Import/Export unter Daten. Mitglieder pflegen ihr Profil unter „Mein Konto“ und wählen je Feld: **öffentlich**, **nur Mitglieder**, **nur Redaktion**. Zugangsdaten (Status, Passwort-Hash, Passkeys, Tokens) liegen getrennt und nie in Export, API, MCP oder Listen. |
+| Profile | Datentabelle „Mitglieder“ (Name, E-Mail, Kurze Vita, optional Website, LinkedIn, Instagram, Facebook, Mastodon, Bluesky + eigene Felder) – eine Datenbasis, Import/Export unter Daten. Mitglieder pflegen ihr Profil unter „Mein Konto“ und wählen je Feld: **öffentlich**, **nur Mitglieder**, **nur Redaktion**. Zugangsdaten (Status, Passwort-Hash, Passkeys, Tokens) liegen getrennt und nie in Export, API, MCP oder Listen. |
 | Profilfoto | quadratisch, ohne Metadaten, nur für Angemeldete sichtbar. |
 | Zugangsdaten ändern | Passwort/Passkeys erst nach Bestätigung (Passwort, Passkey oder E-Mail-Link, 10 Min.); Hinweis-Mail nach jeder Änderung, andere Geräte werden abgemeldet. |
 | Geschützte Medien | Geschützter Pool der Mediathek (Grundeinstellungen → Geteilte Medien → „Geschützt“): Dateien nur für angemeldete Mitglieder. |

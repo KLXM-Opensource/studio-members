@@ -94,3 +94,4 @@
 .mb-vis select, .mb-profile select { font: inherit; font-size: .875em; color: inherit; background: var(--mb-soft); border: 1px solid var(--mb-line); border-radius: .5rem; padding: .375rem .625rem; }
 .mb-profile .mb-f select:not(.mb-vis select) { width: 100%; min-height: 2.75rem; font-size: 1em; }
 .mb-pf__ro { margin: 0; overflow-wrap: anywhere; }
+.mb-sub { margin: .75rem 0 0; font-size: 1.0625em; display: flex; gap: .5rem; align-items: baseline; }
