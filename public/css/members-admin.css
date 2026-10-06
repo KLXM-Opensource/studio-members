@@ -1,0 +1,51 @@
+/* Verwaltung → Mitglieder (Erweiterung members) */
+.mb-adm-nav { display: flex; flex-wrap: wrap; gap: .25rem; margin: 0 0 1.25rem; border-bottom: 1px solid var(--line, #e2e4ea); }
+.mb-adm-nav a { padding: .5rem .875rem; border-radius: .5rem .5rem 0 0; color: inherit; text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.mb-adm-nav a[aria-current="page"] { border-bottom-color: currentColor; font-weight: 600; }
+.mb-adm-nav a:hover { background: color-mix(in srgb, currentColor 6%, transparent); }
+.mb-adm-filter { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: 1rem 0; }
+.mb-adm-filter input[type="search"] { flex: 1 1 14rem; }
+.mb-adm-tablewrap { overflow-x: auto; padding: 0; }
+.mb-adm-invite summary { cursor: pointer; font-weight: 600; display: flex; gap: .5rem; align-items: center; }
+.mb-adm-invite[open] summary { margin-bottom: 1rem; }
+.mb-adm-invite form { display: grid; gap: 1rem; }
+.mb-adm-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.mb-adm-list > li { display: grid; gap: .75rem; padding-top: 1rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
+.mb-adm-list > li:first-child { border-top: 0; padding-top: 0; }
+.mb-adm-list form { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin: 0; }
+.mb-adm-approve fieldset { display: flex; flex-wrap: wrap; gap: .25rem 1rem; border: 0; margin: 0; padding: 0; }
+.mb-adm-approve legend { float: left; margin-right: .5rem; padding: 0; }
+.mb-adm-msg { margin: .5rem 0 0; padding: .5rem .75rem; border-inline-start: 3px solid color-mix(in srgb, currentColor 25%, transparent); white-space: normal; }
+.mb-adm-row { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; margin: 0; }
+.mb-adm-row .f { flex: 1 1 14rem; display: grid; gap: .25rem; margin: 0; }
+.mb-adm-row fieldset.f { display: flex; flex-wrap: wrap; gap: .25rem 1rem; border: 0; padding: 0; }
+.mb-adm-stack { display: grid; gap: .75rem; margin: 0 0 1rem; }
+.mb-adm-stack .f { display: grid; gap: .25rem; margin: 0; }
+.mb-adm-stack fieldset.f { border: 0; padding: 0; }
+.mb-adm-stack fieldset.f label { display: block; }
+.mb-adm-groups, .mb-adm-folders, .mb-adm-files { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
+.mb-adm-groupfoot, .mb-adm-fileactions { display: flex; gap: .75rem; align-items: center; justify-content: space-between; margin-top: .75rem; }
+.mb-adm-fileactions { justify-content: flex-end; margin-top: .5rem; }
+.mb-adm-groupfoot form, .mb-adm-fileactions form { margin: 0; }
+.mb-adm-folders li { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between; }
+.mb-adm-folders a { display: inline-flex; gap: .5rem; align-items: center; color: inherit; }
+.mb-adm-files > li { padding-top: .75rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
+.mb-adm-upload { display: grid; gap: .5rem; margin-bottom: 1.25rem; justify-items: start; }
+.mb-adm-member { grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr); align-items: start; }
+@media (max-width: 60rem) { .mb-adm-member { grid-template-columns: 1fr; } }
+.mb-adm-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+.mb-adm-actions form { margin: 0; }
+.mb-st--pending { background: #fef0c7; color: #7a2e0e; }
+.mb-st--active { background: #dcfae6; color: #085d3a; }
+.mb-st--blocked { background: #fee4e2; color: #912018; }
+.mb-adm-filter :is(input, select) { min-height: 42px; padding: 9px 12px; border-radius: 6px; border: 1.5px solid var(--adm-in); background: var(--adm-surface); color: var(--adm-ink); font: 400 15px var(--adm-font); }
+.mb-adm-filter :is(input, select):focus { border-color: var(--adm-a); outline: none; box-shadow: 0 0 0 3px rgb(var(--adm-a-rgb, 49 65 100) / .15); }
+.mb-adm-filter select { width: auto; }
+.mb-avatar { display: inline-grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: color-mix(in srgb, var(--adm-a, #314164) 14%, transparent); color: var(--adm-ink); font-weight: 700; font-size: 13px; }
+.mb-avatar--l { width: 96px; height: 96px; font-size: 32px; }
+.mb-adm-who { display: flex; gap: 12px; align-items: center; }
+.mb-adm-photo { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
+.mb-adm-photo form { margin: 0; }
+.mb-adm-table { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; align-items: center; }
+.mb-adm-table strong { min-width: 12rem; }
+.mb-adm-table fieldset { display: flex; flex-wrap: wrap; gap: .25rem 1rem; border: 0; margin: 0; padding: 0; }

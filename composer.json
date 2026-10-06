@@ -1,0 +1,11 @@
+{
+    "name": "klxm/studio-members",
+    "description": "KLXM Studio – Mitgliederbereich: geschützte Seiten und Datentabellen, Anmeldung mit Passwort, Passkey oder Anmelde-Link, Einladungen und Anträge, Gruppen, Mitgliederprofile mit Sichtbarkeit je Feld, geschützte Medien",
+    "type": "klxm-studio-extension",
+    "license": "MIT",
+    "keywords": ["klxm-studio", "klxm-studio-extension", "members", "login", "passkey", "webauthn", "protected"],
+    "homepage": "https://studio.klxm.de",
+    "authors": [{ "name": "KLXM Crossmedia GmbH and contributors" }],
+    "require": { "php": ">=8.4.1" },
+    "extra": { "klxm-studio": { "entry": "extension.php", "requires-core": ">=1.0.0" } }
+}
