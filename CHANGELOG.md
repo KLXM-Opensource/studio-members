@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 (2026-10-06)
+
+- Akzent und Rundung aus dem Kit-Vertrag des Kerns (`--kit-accent`, `--kit-radius`): Anmeldung, Konto und Profil passen zu
+  jedem Kit (bisher nur zu fluid-artigen Kits, sonst Blau); ältere Kits über ihre Variablen bzw. Blau als Rückfall.
+
 ## 0.1.0 (2026-10-06)
 
 - Geschützte Seiten (diese Seite und Unterseiten oder nur diese Seite) und Datentabellen, freigegeben für alle Mitglieder oder Gruppen

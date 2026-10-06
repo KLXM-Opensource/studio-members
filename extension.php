@@ -26,7 +26,7 @@ use Klxm\Members\SiteController;
 return [
     'name' => 'members',
     'label' => 'Mitgliederbereich – geschützte Seiten und Dateien',
-    'version' => '0.1.0',
+    'version' => '0.1.1',
     'requires' => '>=1.0.0',
     'description' => 'Geschützte Seiten und Datentabellen mit Anmeldung (Passwort, Passkey, Anmelde-Link), Gruppen, Einladungen und Anträgen; Mitgliederprofile; geschützte Medien.',
     'author' => 'KLXM Crossmedia GmbH and contributors',

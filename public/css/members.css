@@ -1,11 +1,13 @@
 /*
  * Mitgliederbereich (Erweiterung members): Seiten /mitglieder/… im Layout des Kits. Farben und Schrift erbt alles vom Kit
- * (currentColor, color-mix mit Canvas); Akzent aus den üblichen Variablen der Kits, sonst Blau. Buttons: .btn des Kits.
+ * (currentColor, color-mix mit Canvas); Akzent aus dem Kit-Vertrag des Kerns (--kit-accent), bei älteren Kits aus ihren
+ * Variablen, sonst Blau. Buttons: .btn des Kits.
  */
 .mb-wrap {
-  --mb-accent: var(--f-a, var(--color-accent, var(--accent, #2457c5)));
+  --mb-accent: var(--kit-accent, var(--f-a, var(--color-accent, var(--accent, #2457c5))));
   --mb-line: color-mix(in srgb, currentColor 18%, transparent);
   --mb-soft: color-mix(in srgb, currentColor 5%, transparent);
+  --mb-r: var(--kit-radius, .5rem);
   --mb-err: #b42318;
   --mb-ok: #067647;
   padding-block: clamp(2rem, 1rem + 4vw, 5rem);
@@ -23,7 +25,7 @@
 .mb-foot { margin: 0; font-size: .9375em; }
 .mb-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-.mb-note { margin: 0; padding: .75rem 1rem; border-radius: .5rem; border-inline-start: 4px solid var(--mb-ok); background: var(--mb-soft); }
+.mb-note { margin: 0; padding: .75rem 1rem; border-radius: var(--mb-r); border-inline-start: 4px solid var(--mb-ok); background: var(--mb-soft); }
 .mb-note--error { border-color: var(--mb-err); }
 
 .mb-form { display: grid; gap: 1rem; margin: 0; }
@@ -33,7 +35,7 @@
 .mb-f label { font-weight: 600; }
 .mb-f input:not([type="checkbox"]), .mb-f textarea {
   width: 100%; box-sizing: border-box; font: inherit; color: inherit; background: var(--mb-soft);
-  border: 1px solid var(--mb-line); border-radius: .5rem; padding: .6875rem .875rem; min-height: 2.75rem;
+  border: 1px solid var(--mb-line); border-radius: var(--mb-r); padding: .6875rem .875rem; min-height: 2.75rem;
 }
 .mb-f input:focus-visible, .mb-f textarea:focus-visible { outline: 3px solid var(--mb-accent); outline-offset: 1px; border-color: var(--mb-accent); }
 .mb-f--err input, .mb-f--err textarea { border-color: var(--mb-err); }
@@ -57,7 +59,7 @@
 .mb-actions form { margin: 0; }
 
 .mb-areas { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); }
-.mb-areas a { display: grid; gap: .25rem; height: 100%; box-sizing: border-box; padding: 1rem 1.125rem; border: 1px solid var(--mb-line); border-radius: .75rem; color: inherit; text-decoration: none; }
+.mb-areas a { display: grid; gap: .25rem; height: 100%; box-sizing: border-box; padding: 1rem 1.125rem; border: 1px solid var(--mb-line); border-radius: calc(var(--mb-r) * 1.5); color: inherit; text-decoration: none; }
 .mb-areas a:hover, .mb-areas a:focus-visible { border-color: var(--mb-accent); }
 .mb-areas__t { font-weight: 700; }
 .mb-areas__d { font-size: .9375em; opacity: .8; }
@@ -68,7 +70,7 @@
 .mb-sec { display: grid; gap: .75rem; padding-top: 1.25rem; border-top: 1px solid var(--mb-line); }
 .mb-sec h2 { margin: 0; font-size: 1.25em; }
 .mb-keys { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
-.mb-keys li { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .625rem .875rem; border: 1px solid var(--mb-line); border-radius: .5rem; }
+.mb-keys li { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .625rem .875rem; border: 1px solid var(--mb-line); border-radius: var(--mb-r); }
 .mb-keys li span { display: grid; }
 .mb-keys small { opacity: .75; }
 .mb-keys form { margin: 0; }
@@ -86,12 +88,12 @@
 .mb-hello { display: flex; gap: 1.25rem; align-items: center; }
 .mb-hello__pic { border-radius: 50%; }
 .mb-hello .mb-title { margin-top: .25rem; }
-.mb-lock { display: grid; gap: 1rem; padding: 1rem 1.125rem; border: 1px dashed var(--mb-line); border-radius: .75rem; }
+.mb-lock { display: grid; gap: 1rem; padding: 1rem 1.125rem; border: 1px dashed var(--mb-line); border-radius: calc(var(--mb-r) * 1.5); }
 .mb-lock p { margin: 0; }
 .mb-sec h3 { margin: .5rem 0 0; font-size: 1.0625em; }
 .mb-pf__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem 1rem; }
 .mb-pf__head label, .mb-pf__l { font-weight: 600; }
-.mb-vis select, .mb-profile select { font: inherit; font-size: .875em; color: inherit; background: var(--mb-soft); border: 1px solid var(--mb-line); border-radius: .5rem; padding: .375rem .625rem; }
+.mb-vis select, .mb-profile select { font: inherit; font-size: .875em; color: inherit; background: var(--mb-soft); border: 1px solid var(--mb-line); border-radius: var(--mb-r); padding: .375rem .625rem; }
 .mb-profile .mb-f select:not(.mb-vis select) { width: 100%; min-height: 2.75rem; font-size: 1em; }
 .mb-pf__ro { margin: 0; overflow-wrap: anywhere; }
 .mb-sub { margin: .75rem 0 0; font-size: 1.0625em; display: flex; gap: .5rem; align-items: baseline; }
