@@ -41,6 +41,7 @@ final class SelfTest
         $pdo->beginTransaction();
         try {
             echo "Einmal-Links\n";
+            $corePk = (int) $db->fetchValue('SELECT COUNT(*) FROM user_passkeys');   // Vergleichswert: Mitglieder legen dort nie etwas an
             $id = Repo::createMember('selftest-' . bin2hex(random_bytes(3)) . '@example.org', 'Test', 'active');
             $eq('Mitglied = Eintrag der Datentabelle', is_int($id) && Profiles::find($id) !== null, true);
             $eq('keine Zugangsdaten in der Datentabelle', array_intersect(array_keys(Profiles::find($id) ?? []), ['password_hash', 'auth_ver', 'status_access']), []);
@@ -75,7 +76,8 @@ final class SelfTest
 
             echo "Passkeys\n";
             $eq('eigene Tabelle', (int) $db->fetchValue('SELECT COUNT(*) FROM ' . Members::PASSKEYS) >= 0, true);
-            $eq('nie in user_passkeys', \Core\Passkeys::count($db, $id), 0);
+            // Mitglieder-IDs und Konten der Verwaltung sind getrennte Nummernkreise – geprüft wird, dass die Kern-Tabelle unverändert bleibt
+            $eq('nie in user_passkeys', (int) $db->fetchValue('SELECT COUNT(*) FROM user_passkeys'), $corePk);
 
             echo "Geschützte Seiten\n";
             $parent = $db->fetch("SELECT p.* FROM pages p WHERE EXISTS (SELECT 1 FROM pages c WHERE c.parent_id = p.id) AND p.type = 'page' AND p.is_home = 0 LIMIT 1");

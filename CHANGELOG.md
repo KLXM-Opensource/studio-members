@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 – 2026-10-08
+
+- Selbsttest: Prüfung „nie in user_passkeys“ vergleicht die Kern-Tabelle vor und nach dem Test statt die Mitglieds-ID (Fehlalarm, wenn ein Verwaltungskonto mit gleicher Nummer einen Passkey hat).
+
 ## 0.1.1 (2026-10-06)
 
 - Akzent und Rundung aus dem Kit-Vertrag des Kerns (`--kit-accent`, `--kit-radius`): Anmeldung, Konto und Profil passen zu
