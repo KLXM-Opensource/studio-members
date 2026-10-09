@@ -152,4 +152,6 @@ return [
     'Übergeordnete Einstellung' => 'Inherited setting',
     '„{name}“ ist jetzt geschützt.' => '“{name}” is now protected.',
     '„{title}“ ist jetzt geschützt.' => '“{title}” is now protected.',
+    'Achtung: Diese Tabelle steht auf öffentlichen Seiten ({pages}) – Besucher sehen dort keine Einträge. Schutz aufheben oder die Seiten schützen.' => 'Note: this table is shown on public pages ({pages}) – visitors see no entries there. Remove the protection or protect those pages.',
+    'Mitglieder: geschützte Tabelle „{table}“ steht auf öffentlichen Seiten ({pages}) – Besucher sehen dort nichts' => 'Members: protected table “{table}” is shown on public pages ({pages}) – visitors see nothing there',
 ];

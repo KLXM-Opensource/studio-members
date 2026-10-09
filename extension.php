@@ -26,7 +26,7 @@ use Klxm\Members\SiteController;
 return [
     'name' => 'members',
     'label' => 'Mitgliederbereich – geschützte Seiten und Dateien',
-    'version' => '0.1.2',
+    'version' => '0.1.3',
     'requires' => '>=1.0.0',
     'description' => 'Geschützte Seiten und Datentabellen mit Anmeldung (Passwort, Passkey, Anmelde-Link), Gruppen, Einladungen und Anträgen; Mitgliederprofile; geschützte Medien.',
     'author' => 'KLXM Crossmedia GmbH and contributors',
@@ -52,6 +52,13 @@ return [
         $x->permissions('Mitglieder', [Members::PERM => 'Mitglieder, Gruppen, geschützte Seiten und Dateien verwalten']);
         foreach (Repo::tables() as $name => $define) $x->table($name, $define);
         $x->migration(1, fn(Core\Database $db) => Core\Passkeys::ensureTable($db, Members::PASSKEYS));
+
+        // Prüfung (health, Übersicht): geschützte Tabelle auf öffentlicher Seite → Besucher sehen dort eine leere Liste
+        $x->health(function (): array {
+            $out = [];
+            foreach (Members::exposedTables() as $h => $pages) $out[__('Mitglieder: geschützte Tabelle „{table}“ steht auf öffentlichen Seiten ({pages}) – Besucher sehen dort nichts', ['table' => $h, 'pages' => implode(', ', array_slice($pages, 0, 3))])] = null;
+            return $out;
+        });
 
         // Zugriffsschutz (Core\PageAccess): kein Seiten-Cache, nicht in Menü/Sitemap/Suche, Anmeldung für Besucher
         $x->pageAccess([

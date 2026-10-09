@@ -47,6 +47,9 @@ $gl = fn(array $ids) => $ids ? implode(', ', array_map(fn($g) => $groups[$g] ?? 
           <?php foreach ($groups as $gid => $gname): ?><label><input type="checkbox" name="groups[]" value="<?= (int) $gid ?>"<?= in_array((int) $gid, $sel, true) ? ' checked' : '' ?>> <?= e($gname) ?></label><?php endforeach; ?></fieldset><?php endif; ?>
         <button class="adm-btn adm-btn--small"><?= e(__('Speichern')) ?><span class="adm-sr">: <?= e($t['name']) ?></span></button>
       </form>
+      <?php if ($rule !== null && !empty($exposed[$t['handle']])): // geschützt, aber auf öffentlichen Seiten eingebunden → Besucher sehen dort nichts ?>
+      <p class="adm-flash adm-flash--error"><?= e(__('Achtung: Diese Tabelle steht auf öffentlichen Seiten ({pages}) – Besucher sehen dort keine Einträge. Schutz aufheben oder die Seiten schützen.', ['pages' => implode(', ', array_slice($exposed[$t['handle']], 0, 4))])) ?></p>
+      <?php endif; ?>
     </li>
     <?php endforeach; ?>
   </ul>

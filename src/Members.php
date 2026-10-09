@@ -171,6 +171,25 @@ final class Members
 
     // ------------------------------------------------------------------ Zugriff
 
+    /**
+     * Geschützte Tabellen, die auf öffentlichen (nicht geschützten, veröffentlichten) Seiten angezeigt werden – dort sehen
+     * Besucher keine Einträge. handle => [Seitentitel]. Typisch nach einem Wechsel der Profiltabelle (members.table), wenn der
+     * Schutz an der alten Tabelle hängen bleibt.
+     */
+    public static function exposedTables(): array
+    {
+        $rules = Repo::tableRules();
+        if (!$rules) return [];
+        $out = [];
+        foreach (app()->db->fetchAll("SELECT id, parent_id, title, content_published FROM pages WHERE status = 'published' AND COALESCE(type, '') <> 'template'") as $p) {
+            if (self::areaFor($p) !== null) continue;
+            foreach (array_keys($rules) as $h) {
+                if (str_contains((string) $p['content_published'], '"table":"' . $h . '"')) $out[$h][] = (string) $p['title'];
+            }
+        }
+        return $out;
+    }
+
     /** Gruppen (CSV) des geschützten Bereichs, zu dem die Seite gehört – null = frei */
     public static function areaFor(array $page): ?string
     {

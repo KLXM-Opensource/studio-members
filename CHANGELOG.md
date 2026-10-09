@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3 – 2026-10-09
+
+- Warnung, wenn eine geschützte Datentabelle auf öffentlichen Seiten eingebunden ist (Besucher sehen dort eine leere Liste):
+  in Mitglieder → Geschützte Seiten bei der Tabelle und als Hinweis in `php bin/console health` bzw. der Übersicht.
+  Typisch nach einem Wechsel der Profiltabelle (`members.table`), wenn der Schutz an der alten Tabelle hängen bleibt.
+
 ## 0.1.2 – 2026-10-08
 
 - Selbsttest: Prüfung „nie in user_passkeys“ vergleicht die Kern-Tabelle vor und nach dem Test statt die Mitglieds-ID (Fehlalarm, wenn ein Verwaltungskonto mit gleicher Nummer einen Passkey hat).
