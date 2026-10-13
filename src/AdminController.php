@@ -103,12 +103,45 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
             return $this->page('members', ['title' => __('Mitglieder'), 'rows' => Repo::members(), 'status' => '', 'q' => '', 'group' => 0,
                 'groups' => Repo::groupNames(), 'values' => $v, 'errors' => $errors, 'mailOk' => \Core\Mailer::ready()], 422);
         }
-        $id = Repo::createMember($email, (string) ($v['name'] ?? ''), $send ? 'invited' : 'none', array_map('intval', (array) ($v['groups'] ?? [])));
+        if (!$send) {
+            // Nur anlegen: Profil ohne Zugang (Status „Ohne Zugang“) – „Einladung senden“ bzw. „Alle einladen“ später
+            $id = Profiles::create($email, (string) ($v['name'] ?? ''));
+            if (is_array($id)) return $this->to('/admin/mitglieder', 'error', implode(' ', $id));
+            Repo::setGroups($id, array_map('intval', (array) ($v['groups'] ?? [])));
+        }
+        $id = $send ? Repo::createMember($email, (string) ($v['name'] ?? ''), 'invited', array_map('intval', (array) ($v['groups'] ?? []))) : $id;
         if (is_array($id)) return $this->to('/admin/mitglieder', 'error', implode(' ', $id));
         if (!$send) return $this->to('/admin/mitglieder/' . $id, 'success', __('Mitglied {email} angelegt – ohne Einladung. „Einladung senden“ schickt den Zugang, sobald es so weit ist.', ['email' => $email]));
         $err = Mail::invite(Repo::member($id));
         return $err ? $this->to('/admin/mitglieder/' . $id, 'error', __('Mitglied angelegt, aber die Einladung konnte nicht gesendet werden: {err}', ['err' => $err]))
             : $this->to('/admin/mitglieder', 'success', __('Einladung an {email} gesendet.', ['email' => $email]));
+    }
+
+    /** Höchstens so viele Einladungen je Klick (Versand dauert; der Rest mit dem nächsten Klick) */
+    public const INVITE_BATCH = 40;
+
+    /** Mitglieder ohne Zugang einladen: ausgewählte (ids[]) oder alle; je Klick höchstens INVITE_BATCH */
+    public function inviteMany(Request $r): Response
+    {
+        $this->guard($r);
+        if (!\Core\Mailer::ready()) return $this->to('/admin/mitglieder', 'error', __('Der E-Mail-Versand ist nicht eingerichtet (System → E-Mail-Versand) – Einladungen können nicht verschickt werden.'));
+        $ids = array_values(array_filter(array_map('intval', (array) ($r->post['ids'] ?? []))));
+        if (!$ids && !empty($r->post['all'])) $ids = array_map(fn($m) => (int) $m['id'], Repo::members('none'));
+        if (!$ids) return $this->to('/admin/mitglieder', 'error', __('Bitte Mitglieder auswählen.'));
+        $sent = 0;
+        $fails = [];
+        foreach (array_slice($ids, 0, self::INVITE_BATCH) as $id) {
+            $m = Repo::member($id);
+            if (!$m || $m['status'] !== 'none') continue;
+            Repo::ensureAccess($id, 'invited');
+            if ($err = Mail::invite(Repo::member($id))) $fails[] = $m['email'] . ' (' . $err . ')';
+            else $sent++;
+        }
+        $left = count(Repo::members('none'));
+        $msg = $sent === 1 ? __('1 Einladung gesendet.') : __('{n} Einladungen gesendet.', ['n' => $sent]);
+        if ($left) $msg .= ' ' . __('Noch {n} ohne Einladung – „Alle einladen“ erneut klicken.', ['n' => $left]);
+        if ($fails) return $this->to('/admin/mitglieder', 'error', $msg . ' ' . __('Nicht gesendet: {list}', ['list' => implode(', ', $fails)]));
+        return $this->to('/admin/mitglieder', 'success', $msg);
     }
 
     public function edit(Request $r, string $id, array $values = [], array $errors = [], int $status = 200): Response

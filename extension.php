@@ -140,6 +140,7 @@ return [
             $p = Members::PERM;
             $r->get('/admin/mitglieder', [$c, 'index'], $p);
             $r->post('/admin/mitglieder/einladen', [$c, 'invite'], $p);
+            $r->post('/admin/mitglieder/alle-einladen', [$c, 'inviteMany'], $p);
             $r->get('/admin/mitglieder/gruppen', [$c, 'groups'], $p);
             $r->post('/admin/mitglieder/gruppen', [$c, 'saveGroup'], $p);
             $r->post('/admin/mitglieder/gruppen/{id}/loeschen', [$c, 'deleteGroup'], $p);

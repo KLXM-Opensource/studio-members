@@ -166,7 +166,11 @@ final class Repo
     /** Zugang zu einem Profil anlegen (z. B. Profil aus der Datenverwaltung einladen) */
     public static function ensureAccess(int $id, string $status = 'invited', string $application = ''): void
     {
-        if (self::access($id)) return;
+        if ($a = self::access($id)) {
+            // Älterer Eintrag „ohne Zugang“ (none) → jetzt eingeladen o. Ä.
+            if (($a['status'] ?? '') === 'none' && $status !== 'none') self::db()->update('members_access', ['status' => $status], 'entry_id = :id', ['id' => $id]);
+            return;
+        }
         self::db()->insert('members_access', ['entry_id' => $id, 'status' => $status, 'application' => $application !== '' ? $application : null,
             'auth_ver' => 1, 'created_at' => now()]);
     }

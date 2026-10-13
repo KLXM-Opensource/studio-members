@@ -31,6 +31,18 @@ $pending = array_values(array_filter($rows, fn($m) => $m['status'] === 'pending'
 </section>
 <?php endif; ?>
 
+<?php $noneN = (int) ($counts['none'] ?? count(array_filter($rows, fn($m) => $m['status'] === 'none'))); if ($noneN && $status !== 'pending'): // Angelegt, aber noch nicht eingeladen ?>
+<section class="adm-card mb-adm-none" aria-labelledby="mb-none-h">
+  <h2 id="mb-none-h"><?= e(__('Noch nicht eingeladen')) ?> <span class="adm-count"><?= $noneN ?></span></h2>
+  <p class="adm-muted"><?= e(__('Diese Mitglieder sind angelegt, haben aber noch keinen Zugang. „Alle einladen“ schickt jedem die Einladungs-E-Mail (höchstens {n} je Klick); einzelne wählen Sie in der Liste unten aus.', ['n' => AdminController::INVITE_BATCH])) ?></p>
+  <form method="post" action="<?= e(url('/admin/mitglieder/alle-einladen')) ?>" data-confirm="<?= e(__('{n} Mitgliedern jetzt die Einladung senden?', ['n' => min($noneN, AdminController::INVITE_BATCH)])) ?>" class="mb-adm-none__act">
+    <?= csrf_field() ?><input type="hidden" name="all" value="1">
+    <button class="adm-btn adm-btn--primary"<?= $mailOk ? '' : ' disabled' ?>><?= icon('paper-plane-tilt') ?> <?= e(__('Alle einladen')) ?></button>
+    <a class="adm-btn adm-btn--ghost" href="<?= e(url('/admin/mitglieder?status=none')) ?>"><?= e(__('Anzeigen')) ?></a>
+  </form>
+</section>
+<?php endif; ?>
+
 <details class="adm-card mb-adm-invite"<?= $errors ? ' open' : '' ?>>
   <summary><?= icon('plus') ?> <?= e(__('Mitglied anlegen oder einladen')) ?></summary>
   <form method="post" action="<?= e(url('/admin/mitglieder/einladen')) ?>" novalidate>
@@ -54,12 +66,16 @@ $pending = array_values(array_filter($rows, fn($m) => $m['status'] === 'pending'
 </form>
 
 <?php if ($rows): ?>
+<?php $pick = $mailOk && array_filter($rows, fn($m) => $m['status'] === 'none'); // Auswahl zum Einladen (nur Mitglieder ohne Zugang) ?>
+<form method="post" action="<?= e(url('/admin/mitglieder/alle-einladen')) ?>" id="mb-bulk"><?= csrf_field() ?></form>
 <div class="adm-card mb-adm-tablewrap">
+<?php if ($pick): ?><p class="mb-adm-bulk"><button class="adm-btn adm-btn--small" form="mb-bulk"><?= icon('paper-plane-tilt') ?> <?= e(__('Ausgewählte einladen')) ?></button></p><?php endif; ?>
 <table class="adm-table">
-  <thead><tr><th scope="col"><?= e(__('Mitglied')) ?></th><th scope="col"><?= e(__('Status')) ?></th><th scope="col"><?= e(__('Gruppen')) ?></th><th scope="col"><?= e(__('Letzte Anmeldung')) ?></th></tr></thead>
+  <thead><tr><?php if ($pick): ?><th scope="col"><span class="adm-sr"><?= e(__('Auswahl')) ?></span></th><?php endif; ?><th scope="col"><?= e(__('Mitglied')) ?></th><th scope="col"><?= e(__('Status')) ?></th><th scope="col"><?= e(__('Gruppen')) ?></th><th scope="col"><?= e(__('Letzte Anmeldung')) ?></th></tr></thead>
   <tbody>
   <?php foreach ($rows as $m): ?>
     <tr>
+      <?php if ($pick): ?><td><?php if ($m['status'] === 'none'): ?><input type="checkbox" name="ids[]" value="<?= (int) $m['id'] ?>" form="mb-bulk" aria-label="<?= e(__('{name} einladen', ['name' => $m['name'] ?: $m['email']])) ?>"><?php endif; ?></td><?php endif; ?>
       <td class="mb-adm-who"><?= \Klxm\Members\Avatar::html($m, 'mb-avatar mb-avatar--s', 36) ?><span><a href="<?= e(url('/admin/mitglieder/' . (int) $m['id'])) ?>"><strong><?= e($m['name'] ?: $m['email']) ?></strong></a><?php if ($m['name']): ?><br><span class="adm-muted"><?= e($m['email']) ?></span><?php endif; ?></span></td>
       <td><span class="adm-badge mb-st mb-st--<?= e($m['status']) ?>"><?= e($labels[$m['status']] ?? $m['status']) ?></span></td>
       <td><?= e(implode(', ', array_filter(array_map(fn($g) => $groups[$g] ?? null, $m['groups']))) ?: '–') ?></td>

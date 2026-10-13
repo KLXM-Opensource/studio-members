@@ -2,8 +2,11 @@
 
 ## 0.1.4 – 2026-10-13
 
+- **Noch nicht eingeladen:** Kasten in der Mitgliederliste mit Anzahl, „Alle einladen“ (höchstens 40 E-Mails je Klick, Meldung mit
+  dem Rest) und Auswahl einzelner Mitglieder in der Liste („Ausgewählte einladen“).
 - Mitglieder **ohne Einladung anlegen**: „Mitglied anlegen oder einladen“ mit Häkchen „Einladung gleich per E-Mail senden“ (vorbelegt,
-  wenn der E-Mail-Versand eingerichtet ist). Ohne Häkchen Status „Ohne Zugang“; „Einladung senden“ beim Mitglied schickt sie später.
+  wenn der E-Mail-Versand eingerichtet ist). Ohne Häkchen nur das Profil (Status „Ohne Zugang“); „Einladung senden“ beim Mitglied bzw. „Alle einladen“ schickt sie später.
+- Behoben: Einladung eines Profils mit älterem Zugangseintrag „ohne Zugang“ setzt jetzt den Status „Eingeladen“.
 - **Vorlage der Einladungs-E-Mail** unter Einstellungen: Betreff und Text ansehen und ändern (je Sprache), Platzhalter `{name}`,
   `{site}`, `{link}` (Pflicht), `{login}`; unverändert bzw. leer gilt der Standardtext.
 
