@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4 – 2026-10-13
+
+- Mitglieder **ohne Einladung anlegen**: „Mitglied anlegen oder einladen“ mit Häkchen „Einladung gleich per E-Mail senden“ (vorbelegt,
+  wenn der E-Mail-Versand eingerichtet ist). Ohne Häkchen Status „Ohne Zugang“; „Einladung senden“ beim Mitglied schickt sie später.
+- **Vorlage der Einladungs-E-Mail** unter Einstellungen: Betreff und Text ansehen und ändern (je Sprache), Platzhalter `{name}`,
+  `{site}`, `{link}` (Pflicht), `{login}`; unverändert bzw. leer gilt der Standardtext.
+
 ## 0.1.3 – 2026-10-09
 
 - Warnung, wenn eine geschützte Datentabelle auf öffentlichen Seiten eingebunden ist (Besucher sehen dort eine leere Liste):

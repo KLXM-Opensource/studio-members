@@ -32,12 +32,12 @@ $pending = array_values(array_filter($rows, fn($m) => $m['status'] === 'pending'
 <?php endif; ?>
 
 <details class="adm-card mb-adm-invite"<?= $errors ? ' open' : '' ?>>
-  <summary><?= icon('plus') ?> <?= e(__('Mitglied einladen')) ?></summary>
+  <summary><?= icon('plus') ?> <?= e(__('Mitglied anlegen oder einladen')) ?></summary>
   <form method="post" action="<?= e(url('/admin/mitglieder/einladen')) ?>" novalidate>
     <?= csrf_field() ?>
-    <p class="adm-muted"><?= e(__('Das Mitglied erhält eine E-Mail mit einem Link (14 Tage gültig) und legt damit Passwort oder Passkey fest.')) ?></p>
-    <div class="adm-fields"><?= Fields::renderForm(AdminController::inviteFields(), $values, $errors, 'f') ?></div>
-    <button class="adm-btn adm-btn--primary"><?= e(__('Einladung senden')) ?></button>
+    <p class="adm-muted"><?= e(__('Mit Einladung erhält das Mitglied eine E-Mail mit einem Link (14 Tage gültig) und legt damit Passwort oder Passkey fest. Den Text der E-Mail ändern Sie unter Einstellungen.')) ?></p>
+    <div class="adm-fields"><?= Fields::renderForm(AdminController::inviteFields(), $values + ['send' => $mailOk], $errors, 'f') ?></div>
+    <button class="adm-btn adm-btn--primary"><?= e(__('Mitglied anlegen')) ?></button>
   </form>
 </details>
 

@@ -59,6 +59,8 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
             ['name' => 'name', 'label' => __('Name'), 'type' => 'text', 'max' => 120, 'width' => 'half'],
             ['name' => 'groups', 'label' => __('Gruppen'), 'type' => 'multiselect', 'options' => self::groupOptions(),
                 'help' => __('Ohne Gruppe sieht das Mitglied nur Bereiche, die für „alle Mitglieder“ freigegeben sind.')],
+            ['name' => 'send', 'label' => __('Einladung gleich per E-Mail senden'), 'type' => 'bool',
+                'help' => __('Ohne Häkchen wird das Mitglied nur angelegt (Status „Ohne Zugang“) – die Einladung schicken Sie später über „Einladung senden“ beim Mitglied.')],
         ];
     }
 
@@ -94,13 +96,16 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
         [$v, $errors] = Fields::sanitize(self::inviteFields(), (array) ($r->post['f'] ?? []));
         $email = mb_strtolower(trim((string) ($v['email'] ?? '')));
         if (!$errors && !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = __('Bitte eine gültige E-Mail-Adresse eingeben.');
-        if (!$errors && ($o = Repo::memberByEmail($email)) && $o['status'] !== 'none') $errors['email'] = __('Zu dieser Adresse gibt es schon einen Zugang.');
+        $send = !empty($v['send']);
+        // Einladen: ein Profil ohne Zugang darf eingeladen werden; nur anlegen: die Adresse darf es noch nicht geben
+        if (!$errors && ($o = Repo::memberByEmail($email)) && ($o['status'] !== 'none' || !$send)) $errors['email'] = $o['status'] !== 'none' ? __('Zu dieser Adresse gibt es schon einen Zugang.') : __('Zu dieser Adresse gibt es schon ein Mitglied.');
         if ($errors) {
             return $this->page('members', ['title' => __('Mitglieder'), 'rows' => Repo::members(), 'status' => '', 'q' => '', 'group' => 0,
                 'groups' => Repo::groupNames(), 'values' => $v, 'errors' => $errors, 'mailOk' => \Core\Mailer::ready()], 422);
         }
-        $id = Repo::createMember($email, (string) ($v['name'] ?? ''), 'invited', array_map('intval', (array) ($v['groups'] ?? [])));
+        $id = Repo::createMember($email, (string) ($v['name'] ?? ''), $send ? 'invited' : 'none', array_map('intval', (array) ($v['groups'] ?? [])));
         if (is_array($id)) return $this->to('/admin/mitglieder', 'error', implode(' ', $id));
+        if (!$send) return $this->to('/admin/mitglieder/' . $id, 'success', __('Mitglied {email} angelegt – ohne Einladung. „Einladung senden“ schickt den Zugang, sobald es so weit ist.', ['email' => $email]));
         $err = Mail::invite(Repo::member($id));
         return $err ? $this->to('/admin/mitglieder/' . $id, 'error', __('Mitglied angelegt, aber die Einladung konnte nicht gesendet werden: {err}', ['err' => $err]))
             : $this->to('/admin/mitglieder', 'success', __('Einladung an {email} gesendet.', ['email' => $email]));
@@ -337,6 +342,10 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
             ['name' => 'home', 'label' => __('Nach der Anmeldung zu'), 'type' => 'link',
                 'help' => __('Seite aus dem Seitenbaum wählen. Leer = Übersicht mit allen freigegebenen Bereichen.')],
             ['name' => 'magic', 'label' => __('Anmelde-Link per E-Mail erlauben'), 'type' => 'bool', 'help' => __('Anmelden ohne Passwort: ein Link, 15 Minuten gültig, einmal verwendbar.')],
+            ['type' => 'heading', 'label' => __('Einladungs-E-Mail')],
+            ['name' => 'invite_subject', 'label' => __('Betreff'), 'type' => 'text', 'max' => 200],
+            ['name' => 'invite_text', 'label' => __('Text'), 'type' => 'textarea', 'rows' => 11, 'max' => 4000,
+                'help' => __('Platzhalter: {name} (Name des Mitglieds), {site} (Name der Website), {link} (Link zum Festlegen von Passwort/Passkey, 14 Tage gültig – muss enthalten sein), {login} (Anmeldeseite). Text leeren = Standardtext.')],
             ['type' => 'heading', 'label' => __('Zugang beantragen')],
             ['name' => 'apply', 'label' => __('Besucher können einen Zugang beantragen'), 'type' => 'bool',
                 'help' => __('Auf der Anmeldeseite erscheint „Zugang beantragen“. Neue Anträge prüfen und freischalten Sie unter Mitglieder → „Offene Anträge“.')],
@@ -348,6 +357,8 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
             $f[] = ['type' => 'heading', 'label' => __('Texte auf {lang}', ['lang' => $name])];
             $f[] = ['name' => 'intro_' . $code, 'label' => __('Text auf der Anmeldeseite'), 'type' => 'textarea', 'max' => 600, 'help' => __('Leer = Text der Standardsprache.')];
             $f[] = ['name' => 'apply_text_' . $code, 'label' => __('Text über dem Antragsformular'), 'type' => 'textarea', 'max' => 1000, 'show_if' => ['apply' => true]];
+            $f[] = ['name' => 'invite_subject_' . $code, 'label' => __('Betreff der Einladung'), 'type' => 'text', 'max' => 200];
+            $f[] = ['name' => 'invite_text_' . $code, 'label' => __('Text der Einladung'), 'type' => 'textarea', 'rows' => 11, 'max' => 4000, 'help' => __('Platzhalter wie oben.')];
         }
         return $f;
     }
@@ -360,9 +371,12 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
             $values = ['intro' => (string) $s->get('members.intro', ''), 'apply_text' => (string) $s->get('members.apply_text', ''),
                 'notify' => (string) $s->get('members.notify', ''), 'magic' => (bool) $s->get('members.magic', true), 'apply' => (bool) $s->get('members.apply', false),
                 'home' => ($h = (int) $s->get('members.home', 0)) ? 'page:' . $h : ''];
+            // Einladung: gespeicherte Vorlage, sonst der Standardtext zum Ansehen und Anpassen
+            [$values['invite_subject'], $values['invite_text']] = Mail::inviteTemplate(null);
             foreach (array_keys(self::otherLangs()) as $code) {
                 $values['intro_' . $code] = (string) $s->get("members.intro.$code", '');
                 $values['apply_text_' . $code] = (string) $s->get("members.apply_text.$code", '');
+                [$values['invite_subject_' . $code], $values['invite_text_' . $code]] = Mail::inviteTemplate($code);
             }
         }
         return $this->page('settings', ['title' => __('Einstellungen · Mitglieder'), 'values' => $values, 'errors' => $errors, 'tab' => 'settings'], $status);
@@ -376,6 +390,10 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
         if ($bad) $errors['notify'] = __('Ungültige Adresse: {list}', ['list' => implode(', ', $bad)]);
         $home = (string) ($v['home'] ?? '');
         if ($home !== '' && !preg_match('~^page:(\d+)$~', $home)) $errors['home'] = __('Bitte eine Seite der Website wählen.');
+        foreach (array_merge([''], array_map(fn($c) => '_' . $c, array_keys(self::otherLangs()))) as $sfx) {
+            $txt = trim((string) ($v['invite_text' . $sfx] ?? ''));
+            if ($txt !== '' && !str_contains($txt, '{link}')) $errors['invite_text' . $sfx] = __('Der Text braucht den Platzhalter {link} – sonst kann das Mitglied seinen Zugang nicht einrichten.');
+        }
         if ($errors) return $this->settings($r, $v, $errors, 422);
         $s = app()->settings;
         $s->set('members.intro', (string) ($v['intro'] ?? ''));
@@ -384,9 +402,11 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
         $s->set('members.apply', !empty($v['apply']));
         $s->set('members.apply_text', (string) ($v['apply_text'] ?? ''));
         $s->set('members.notify', (string) ($v['notify'] ?? ''));
+        Mail::saveInviteTemplate(null, (string) ($v['invite_subject'] ?? ''), (string) ($v['invite_text'] ?? ''));
         foreach (array_keys(self::otherLangs()) as $code) {
             $s->set("members.intro.$code", (string) ($v['intro_' . $code] ?? ''));
             $s->set("members.apply_text.$code", (string) ($v['apply_text_' . $code] ?? ''));
+            Mail::saveInviteTemplate($code, (string) ($v['invite_subject_' . $code] ?? ''), (string) ($v['invite_text_' . $code] ?? ''));
         }
         return $this->to('/admin/mitglieder/einstellungen', 'success', __('Einstellungen gespeichert.'));
     }

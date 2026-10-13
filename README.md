@@ -20,7 +20,7 @@ Aktivieren je Website unter **Administration → Funktionen & Erweiterungen** od
 | Geschützte Seiten | Verwaltung → Mitglieder → Geschützte Seiten: Seite im Struktur-Browser wählen, gilt für die Seite und ihre Unterseiten oder nur für die Seite; freigegeben für alle Mitglieder oder Gruppen. Auch in den Seiteneinstellungen (Karte „Mitgliederbereich“) und im Seitenbaum (Schloss). |
 | Geschützte Datentabellen | Detailseiten verlangen die Anmeldung; auf öffentlichen Seiten bleiben Listen, Kalender und Feeds der Tabelle leer. |
 | Anmeldung | `/mitglieder/anmelden`: Passkey, Passwort oder Anmelde-Link (15 Min., einmal). Sitzung getrennt von der Verwaltung (Mitglieder kommen nie in `/admin`). |
-| Einladungen & Anträge | Redaktion lädt ein (Link 14 Tage); optional „Zugang beantragen“ (`/mitglieder/zugang`) mit Freischaltung durch die Redaktion. |
+| Einladungen & Anträge | Redaktion legt Mitglieder an – gleich mit Einladung (Link 14 Tage) oder erst ohne Zugang und lädt später ein; Text der Einladungs-E-Mail unter Einstellungen (Platzhalter `{name}`, `{site}`, `{link}`, `{login}`, je Sprache); optional „Zugang beantragen“ (`/mitglieder/zugang`) mit Freischaltung durch die Redaktion. |
 | Gruppen | z. B. Vorstand, Presse – für Seiten und Tabellen. |
 | Profile | Datentabelle „Mitglieder“ (Name, E-Mail, Kurze Vita, optional Website, LinkedIn, Instagram, Facebook, Mastodon, Bluesky + eigene Felder) – eine Datenbasis, Import/Export unter Daten. Mitglieder pflegen ihr Profil unter „Mein Konto“ und wählen je Feld: **öffentlich**, **nur Mitglieder**, **nur Redaktion**. Zugangsdaten (Status, Passwort-Hash, Passkeys, Tokens) liegen getrennt und nie in Export, API, MCP oder Listen. |
 | Profilfoto | quadratisch, ohne Metadaten, nur für Angemeldete sichtbar. |

@@ -28,7 +28,7 @@ $base = '/admin/mitglieder/' . (int) $m['id'];
     <?php if (trim((string) $m['application']) !== ''): ?><h3><?= e(__('Antrag')) ?></h3><p class="mb-adm-msg"><?= nl2br(e($m['application']), false) ?></p><?php endif; ?>
     <div class="mb-adm-actions">
       <?php if ($m['status'] !== 'blocked' && $m['status'] !== 'active'): ?>
-      <form method="post" action="<?= e(url($base . '/einladung')) ?>"><?= csrf_field() ?><button class="adm-btn adm-btn--small adm-btn--primary"><?= e($m['status'] === 'pending' ? __('Freischalten und einladen') : __('Einladung erneut senden')) ?></button></form>
+      <form method="post" action="<?= e(url($base . '/einladung')) ?>"><?= csrf_field() ?><button class="adm-btn adm-btn--small adm-btn--primary"><?= e($m['status'] === 'pending' ? __('Freischalten und einladen') : ($m['status'] === 'none' || !$m['invited_at'] ? __('Einladung senden') : __('Einladung erneut senden'))) ?></button></form>
       <?php endif; ?>
       <?php if ($m['status'] === 'active'): ?>
       <form method="post" action="<?= e(url($base . '/zugang-zuruecksetzen')) ?>" data-confirm="<?= e(__('Passwort und Passkeys von {email} entfernen und alle Sitzungen beenden?', ['email' => $m['email']])) ?>"><?= csrf_field() ?><button class="adm-btn adm-btn--small"><?= e(__('Zugang zurücksetzen')) ?></button></form>

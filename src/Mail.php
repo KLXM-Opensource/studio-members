@@ -21,14 +21,46 @@ final class Mail
         return Members::inLang($m['lang'] ?? null, function () use ($m): ?string {
             $token = Repo::token((int) $m['id'], 'invite', Members::INVITE_TTL);
             Repo::updateMember((int) $m['id'], ['invited_at' => now()]);
-            $site = site_name();
-            $text = lt('Guten Tag {name},', ['name' => $m['name'] ?: $m['email']]) . "\n\n"
-                . lt('Sie haben Zugang zum Mitgliederbereich von {site}. Über diesen Link legen Sie Ihr Passwort fest oder richten einen Passkey ein (gültig 14 Tage):', ['site' => $site]) . "\n\n"
-                . self::link('einladung/' . $token) . "\n\n"
-                . lt('Danach melden Sie sich hier an: {url}', ['url' => self::link('anmelden')]) . "\n\n"
-                . lt('Wenn Sie diese E-Mail nicht erwartet haben, können Sie sie ignorieren.');
-            return Mailer::send(lt('Ihr Zugang zum Mitgliederbereich – {site}', ['site' => $site]), $text, [(string) $m['email']]);
+            // Vorlage aus Mitglieder → Einstellungen (je Sprache), sonst Standardtext; {link} fehlt nie (Prüfung beim Speichern, sonst angehängt)
+            [$subject, $text] = self::inviteTemplate(\Core\Lang::current());
+            $link = self::link('einladung/' . $token);
+            if (!str_contains($text, '{link}')) $text .= "\n\n{link}";
+            $vars = ['{name}' => $m['name'] ?: $m['email'], '{site}' => site_name(), '{link}' => $link, '{login}' => self::link('anmelden')];
+            return Mailer::send(strtr($subject, $vars), strtr($text, $vars), [(string) $m['email']]);
         });
+    }
+
+    /** Standard der Einladung mit Platzhaltern ({name}, {site}, {link}, {login}) in der aktuellen Sprache der Website */
+    public static function inviteDefault(): array
+    {
+        $ph = fn(string $k) => '{' . $k . '}';
+        return [lt('Ihr Zugang zum Mitgliederbereich – {site}', ['site' => $ph('site')]),
+            lt('Guten Tag {name},', ['name' => $ph('name')]) . "\n\n"
+            . lt('Sie haben Zugang zum Mitgliederbereich von {site}. Über diesen Link legen Sie Ihr Passwort fest oder richten einen Passkey ein (gültig 14 Tage):', ['site' => $ph('site')]) . "\n\n"
+            . '{link}' . "\n\n"
+            . lt('Danach melden Sie sich hier an: {url}', ['url' => $ph('login')]) . "\n\n"
+            . lt('Wenn Sie diese E-Mail nicht erwartet haben, können Sie sie ignorieren.')];
+    }
+
+    /** Vorlage der Einladung [Betreff, Text] für eine Sprache (null = Standardsprache): gespeichert, sonst Standard */
+    public static function inviteTemplate(?string $lang): array
+    {
+        $sfx = $lang !== null && $lang !== \Core\Lang::default() ? '.' . $lang : '';
+        $s = app()->settings;
+        [$ds, $dt] = $lang !== null ? Members::inLang($lang, fn() => self::inviteDefault()) : self::inviteDefault();
+        $subject = trim((string) $s->get('members.invite_subject' . $sfx, ''));
+        $text = trim((string) $s->get('members.invite_text' . $sfx, ''));
+        return [$subject !== '' ? $subject : $ds, $text !== '' ? $text : $dt];
+    }
+
+    /** Vorlage speichern – unverändert gegenüber dem Standard (oder leer) wird nichts gespeichert, Änderungen am Standardtext greifen dann weiter */
+    public static function saveInviteTemplate(?string $lang, string $subject, string $text): void
+    {
+        $sfx = $lang !== null && $lang !== \Core\Lang::default() ? '.' . $lang : '';
+        [$ds, $dt] = $lang !== null ? Members::inLang($lang, fn() => self::inviteDefault()) : self::inviteDefault();
+        $norm = fn(string $t) => trim(str_replace("\r\n", "\n", $t));
+        app()->settings->set('members.invite_subject' . $sfx, $norm($subject) === $norm($ds) ? '' : $norm($subject));
+        app()->settings->set('members.invite_text' . $sfx, $norm($text) === $norm($dt) ? '' : $norm($text));
     }
 
     /** Anmelde-Link (ohne Passwort), 15 Minuten gültig, einmal verwendbar */
