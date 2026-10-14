@@ -57,6 +57,8 @@ return [
         $x->health(function (): array {
             $out = [];
             foreach (Members::exposedTables() as $h => $pages) $out[__('Mitglieder: geschützte Tabelle „{table}“ steht auf öffentlichen Seiten ({pages}) – Besucher sehen dort nichts', ['table' => $h, 'pages' => implode(', ', array_slice($pages, 0, 3))])] = null;
+            // Umgekehrt (Datenschutz): Liste im geschützten Bereich, Einträge aber öffentlich über Detailseiten, Suche, Sitemap
+            foreach (Members::leakingTables() as $h => $pages) $out[__('Mitglieder: Tabelle „{table}“ steht im geschützten Bereich ({pages}), ihre Einträge sind aber öffentlich (Detailseiten, Suche) – unter Geschützte Seiten → Datentabellen schützen', ['table' => $h, 'pages' => implode(', ', array_slice($pages, 0, 3))])] = false;
             return $out;
         });
 

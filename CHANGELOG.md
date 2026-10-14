@@ -3,7 +3,8 @@
 ## 0.1.5 – 2026-10-14
 
 - **Mitglieder importieren (CSV):** Mitglieder → „Mitglieder importieren (CSV)“ mit Vorlage zum Herunterladen (E-Mail, Name, Gruppen, Profilfelder; Semikolon, UTF-8 für Excel). Vorhandene Listen funktionieren auch – Spalten werden an der Überschrift erkannt (E-Mail, Name oder Vorname/Nachname, Gruppen, Profilfelder nach Bezeichnung oder Kurzname); Trennzeichen ; , oder Tab, UTF-8 oder Windows-1252. Erst eine **Vorschau** (neu, vorhanden, ungültig, doppelt), dann übernehmen: vorhandene ergänzen oder überspringen, unbekannte Gruppen anlegen, neue gleich einladen (höchstens 40 je Schritt, Rest über „Alle einladen“). Ohne Einladung entstehen sie „ohne Zugang“. Höchstens 2000 Zeilen bzw. 2 MB je Datei.
-- *EN:* **Import members (CSV)** with a downloadable template, column detection by heading, preview, update-or-skip for existing members, auto-create groups and optional invitations (batches of 40).
+- **Datenschutz-Warnung:** Wird eine Tabelle im geschützten Bereich gelistet, ist selbst aber nicht geschützt und hat öffentliche Detailseiten, warnen „Geschützte Seiten → Datentabellen“ (mit Knopf „Tabelle schützen“) und der Health-Check – sonst sind die Einträge über Detailseiten, Suche und Sitemap für alle erreichbar.
+- *EN:* **Import members (CSV)** with a downloadable template, column detection by heading, preview, update-or-skip for existing members, auto-create groups and optional invitations (batches of 40). Privacy warning when a table is listed in the protected area but its detail pages are public.
 
 ## 0.1.4 – 2026-10-13
 

@@ -57,3 +57,5 @@
 .mb-import__table{overflow-x:auto}
 .mb-import__sum b{font-size:1.15em}
 .mb-import__r--invalid td,.mb-import__r--duplicate td{color:var(--adm-err,#B42318)}
+.mb-adm-leak{display:grid;gap:8px;margin:0 0 12px}
+.mb-adm-leak p{margin:0}

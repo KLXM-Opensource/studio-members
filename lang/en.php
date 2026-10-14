@@ -230,4 +230,9 @@ return [
     'Übernehmen' => 'Import',
     'Überspringen' => 'Skip',
     '… und {n} weitere Zeilen.' => '… and {n} more rows.',
+    // Warnung: Tabelle im geschützten Bereich, Einträge öffentlich
+    'Mitglieder: Tabelle „{table}“ steht im geschützten Bereich ({pages}), ihre Einträge sind aber öffentlich (Detailseiten, Suche) – unter Geschützte Seiten → Datentabellen schützen' => 'Members: table “{table}” is listed in the protected area ({pages}) but its entries are public (detail pages, search) – protect it under Protected pages → Data tables',
+    '„{table}“ ist nicht geschützt' => '“{table}” is not protected',
+    'die Liste steht im geschützten Bereich ({pages}), die Einträge sind über ihre Detailseiten, die Suche und die Sitemap aber für alle erreichbar.' => 'the list is in the protected area ({pages}), but the entries are reachable for everyone via their detail pages, search and sitemap.',
+    'Tabelle schützen (alle Mitglieder)' => 'Protect table (all members)',
 ];

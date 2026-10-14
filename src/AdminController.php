@@ -319,7 +319,7 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
         usort($rows, fn($a, $b) => strcasecmp((string) $a['page']['title'], (string) $b['page']['title']));
         $tables = array_values(array_filter(\Core\Data\Tables::content(), fn($t) => empty($t['settings']['inbox'])));
         return $this->page('areas', ['title' => __('Geschützte Seiten · Mitglieder'), 'rows' => $rows, 'groups' => Repo::groupNames(), 'tab' => 'areas',
-            'tables' => $tables, 'rules' => Repo::tableRules(), 'exposed' => Members::exposedTables()]);
+            'tables' => $tables, 'rules' => Repo::tableRules(), 'exposed' => Members::exposedTables(), 'leaking' => Members::leakingTables()]);
     }
 
     private static function countChildren(int $id): int

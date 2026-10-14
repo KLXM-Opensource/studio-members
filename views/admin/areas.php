@@ -1,5 +1,5 @@
 <?php
-/** Geschützte Seiten und Datentabellen. @var array $rows  @var array $groups  @var array $tables  @var array $rules */
+/** Geschützte Seiten und Datentabellen. @var array $rows  @var array $groups  @var array $tables  @var array $rules  @var array $leaking */
 $gl = fn(array $ids) => $ids ? implode(', ', array_map(fn($g) => $groups[$g] ?? __('(gelöschte Gruppe)'), $ids)) : __('Alle Mitglieder');
 ?>
 <section class="adm-card">
@@ -36,6 +36,13 @@ $gl = fn(array $ids) => $ids ? implode(', ', array_map(fn($g) => $groups[$g] ?? 
   <h2 id="mb-h-tables"><?= e(__('Datentabellen')) ?></h2>
   <p class="adm-muted"><?= e(__('Eine geschützte Tabelle zeigt ihre Einträge nur angemeldeten Mitgliedern: Detailseiten verlangen die Anmeldung, und auf öffentlichen Seiten bleiben Listen, Kalender und Feeds dieser Tabelle leer. Listen gehören deshalb auf geschützte Seiten.')) ?></p>
   <?php if (!$tables): ?><p class="adm-muted"><?= e(__('Keine Datentabellen vorhanden.')) ?></p><?php endif; ?>
+  <?php foreach ($leaking ?? [] as $lh => $lpages): $lt = \Core\Data\Tables::findContent($lh); if (!$lt) continue; ?>
+  <div class="adm-flash adm-flash--error mb-adm-leak" role="alert">
+    <p><b><?= e(__('„{table}“ ist nicht geschützt', ['table' => $lt['name']])) ?></b> – <?= e(__('die Liste steht im geschützten Bereich ({pages}), die Einträge sind über ihre Detailseiten, die Suche und die Sitemap aber für alle erreichbar.', ['pages' => implode(', ', array_slice($lpages, 0, 3))])) ?></p>
+    <form method="post" action="<?= e(url('/admin/mitglieder/tabelle/' . rawurlencode($lh))) ?>"><?= csrf_field() ?><input type="hidden" name="protect" value="1">
+      <button class="adm-btn adm-btn--small adm-btn--primary"><?= e(__('Tabelle schützen (alle Mitglieder)')) ?></button></form>
+  </div>
+  <?php endforeach; ?>
   <ul class="mb-adm-list" role="list">
     <?php foreach ($tables as $t): $rule = $rules[$t['handle']] ?? null; $sel = $rule !== null ? array_filter(array_map('intval', explode(',', $rule))) : []; ?>
     <li>

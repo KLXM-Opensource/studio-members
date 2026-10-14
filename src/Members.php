@@ -190,6 +190,31 @@ final class Members
         return $out;
     }
 
+    /**
+     * Umgekehrter Fall: Tabelle wird auf einer geschützten Seite gelistet, ist selbst aber nicht geschützt und hat öffentliche
+     * Detailseiten – ihre Einträge sind dann trotzdem für alle erreichbar (Detailseiten, Suche, Sitemap).
+     * @return array<string, list<string>> Tabelle (handle) → Titel der geschützten Seiten, auf denen sie steht
+     */
+    public static function leakingTables(): array
+    {
+        if (!Repo::areas()) return [];
+        $rules = Repo::tableRules();
+        $open = [];
+        foreach (\Core\Data\Tables::content() as $t) {
+            if (isset($rules[$t['handle']]) || !empty($t['settings']['inbox']) || ($t['settings']['route'] ?? '') === '' || empty($t['settings']['detail_page_id'])) continue;
+            $open[$t['handle']] = true;
+        }
+        if (!$open) return [];
+        $out = [];
+        foreach (app()->db->fetchAll("SELECT id, parent_id, title, content_published FROM pages WHERE COALESCE(type, '') <> 'template' AND content_published IS NOT NULL") as $p) {
+            if (self::areaFor($p) === null) continue;
+            foreach (array_keys($open) as $h) {
+                if (str_contains((string) $p['content_published'], '"table":"' . $h . '"')) $out[$h][] = (string) $p['title'];
+            }
+        }
+        return $out;
+    }
+
     /** Gruppen (CSV) des geschützten Bereichs, zu dem die Seite gehört – null = frei */
     public static function areaFor(array $page): ?string
     {
