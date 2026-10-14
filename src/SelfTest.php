@@ -35,6 +35,19 @@ final class SelfTest
         $eq('gesperrt', Members::allowed(['status' => 'blocked', 'groups' => []] + $m, ''), false);
         $eq('ohne Anmeldung', Members::allowed(null, ''), false);
 
+        echo "Import (CSV, nur Prüfung – nichts wird gespeichert)\n";
+        $p = Import::parse("\xEF\xBB\xBFVorname;Nachname;E-Mail;Gruppen\nAnna;B;Anna@Example.org;A, B\n;;kaputt;\nX;Y;anna@example.org;\n");
+        $eq('Spalte E-Mail erkannt, kein Fehler', $p['error'], null);
+        $eq('Name aus Vor- und Nachname', $p['rows'][0]['name'] ?? null, 'Anna B');
+        $eq('E-Mail klein geschrieben', $p['rows'][0]['email'] ?? null, 'anna@example.org');
+        $eq('Gruppen getrennt', $p['rows'][0]['groups'] ?? null, ['A', 'B']);
+        $eq('ungültige Adresse erkannt', $p['rows'][1]['status'] ?? null, 'invalid');
+        $eq('Doppel in der Datei erkannt', $p['rows'][2]['status'] ?? null, 'duplicate');
+        $eq('Komma als Trennzeichen', Import::parse("email,name\nc@example.org,C\n")['rows'][0]['name'] ?? null, 'C');
+        $eq('ohne Spalte E-Mail → Fehler', Import::parse("Name\nX\n")['error'] !== null, true);
+        $eq('Windows-1252 (Excel) wird gelesen', Import::parse(mb_convert_encoding("E-Mail;Name\nd@example.org;Jürgen\n", 'Windows-1252', 'UTF-8'))['rows'][0]['name'] ?? null, 'Jürgen');
+        $eq('Vorlage beginnt mit BOM und E-Mail-Spalte', str_starts_with(Import::template(), "\xEF\xBB\xBFE-Mail;Name;Gruppen"), true);
+
         $db = app()->db;
         $pdo = $db->pdo;
         Profiles::table();   // Datentabelle „Mitglieder“ vor der Transaktion anlegen (DDL)

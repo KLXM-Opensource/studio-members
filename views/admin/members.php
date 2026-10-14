@@ -43,6 +43,7 @@ $pending = array_values(array_filter($rows, fn($m) => $m['status'] === 'pending'
 </section>
 <?php endif; ?>
 
+<p class="mb-adm-import"><a class="adm-btn adm-btn--ghost adm-btn--small" href="<?= e(url('/admin/mitglieder/import')) ?>"><?= icon('upload-simple') ?> <?= e(__('Mitglieder importieren (CSV)')) ?></a></p>
 <details class="adm-card mb-adm-invite"<?= $errors ? ' open' : '' ?>>
   <summary><?= icon('plus') ?> <?= e(__('Mitglied anlegen oder einladen')) ?></summary>
   <form method="post" action="<?= e(url('/admin/mitglieder/einladen')) ?>" novalidate>

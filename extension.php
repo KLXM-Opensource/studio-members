@@ -26,7 +26,7 @@ use Klxm\Members\SiteController;
 return [
     'name' => 'members',
     'label' => 'Mitgliederbereich – geschützte Seiten und Dateien',
-    'version' => '0.1.4',
+    'version' => '0.1.5',
     'requires' => '>=1.0.0',
     'description' => 'Geschützte Seiten und Datentabellen mit Anmeldung (Passwort, Passkey, Anmelde-Link), Gruppen, Einladungen und Anträgen; Mitgliederprofile; geschützte Medien.',
     'author' => 'KLXM Crossmedia GmbH and contributors',
@@ -141,6 +141,11 @@ return [
             $r->get('/admin/mitglieder', [$c, 'index'], $p);
             $r->post('/admin/mitglieder/einladen', [$c, 'invite'], $p);
             $r->post('/admin/mitglieder/alle-einladen', [$c, 'inviteMany'], $p);
+            // Import (CSV) – vor /admin/mitglieder/{id}
+            $r->get('/admin/mitglieder/import', [$c, 'importForm'], $p);
+            $r->get('/admin/mitglieder/import/vorlage.csv', [$c, 'importTemplate'], $p);
+            $r->post('/admin/mitglieder/import', [$c, 'importPreview'], $p);
+            $r->post('/admin/mitglieder/import/uebernehmen', [$c, 'importRun'], $p);
             $r->get('/admin/mitglieder/gruppen', [$c, 'groups'], $p);
             $r->post('/admin/mitglieder/gruppen', [$c, 'saveGroup'], $p);
             $r->post('/admin/mitglieder/gruppen/{id}/loeschen', [$c, 'deleteGroup'], $p);

@@ -117,6 +117,53 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
             : $this->to('/admin/mitglieder', 'success', __('Einladung an {email} gesendet.', ['email' => $email]));
     }
 
+    // ------------------------------------------------------------------ Import (CSV): Vorlage, Vorschau, Übernehmen
+
+    public function importForm(Request $r): Response
+    {
+        $this->guard($r);
+        return $this->page('import', ['title' => __('Mitglieder importieren'), 'tab' => 'members', 'fields' => Import::fields(), 'preview' => null, 'mailOk' => \Core\Mailer::ready()]);
+    }
+
+    public function importTemplate(Request $r): Response
+    {
+        $this->guard($r);
+        return (new Response(Import::template(), 200))->header('Content-Type', 'text/csv; charset=utf-8')
+            ->header('Content-Disposition', 'attachment; filename="mitglieder-vorlage.csv"')->header('Cache-Control', 'no-store');
+    }
+
+    /** Datei hochladen → Vorschau; die geprüften Zeilen liegen bis zum Übernehmen in der Sitzung */
+    public function importPreview(Request $r): Response
+    {
+        $this->guard($r);
+        $f = $r->files['csv'] ?? null;
+        if (!is_array($f) || ($f['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || !is_uploaded_file((string) $f['tmp_name'])) {
+            return $this->to('/admin/mitglieder/import', 'error', __('Bitte eine CSV-Datei auswählen.'));
+        }
+        $p = Import::parse((string) file_get_contents((string) $f['tmp_name']));
+        if ($p['error'] && !$p['rows']) return $this->to('/admin/mitglieder/import', 'error', $p['error']);
+        app()->session->set('members_import', ['rows' => $p['rows'], 'at' => time(), 'file' => mb_substr((string) ($f['name'] ?? ''), 0, 120)]);
+        return $this->page('import', ['title' => __('Mitglieder importieren'), 'tab' => 'members', 'fields' => Import::fields(), 'preview' => $p,
+            'file' => (string) ($f['name'] ?? ''), 'mailOk' => \Core\Mailer::ready()]);
+    }
+
+    public function importRun(Request $r): Response
+    {
+        $this->guard($r);
+        $s = app()->session->get('members_import');
+        if (!is_array($s) || empty($s['rows']) || (int) ($s['at'] ?? 0) < time() - 3600) return $this->to('/admin/mitglieder/import', 'error', __('Die Vorschau ist abgelaufen – bitte die Datei erneut hochladen.'));
+        app()->session->forget('members_import');
+        $res = Import::apply($s['rows'], ['update' => $r->str('existing') === 'update', 'create_groups' => $r->str('create_groups') === '1', 'invite' => $r->str('invite') === '1']);
+        $msg = __('Import: {c} neu, {u} ergänzt, {s} übersprungen.', ['c' => $res['created'], 'u' => $res['updated'], 's' => $res['skipped']]);
+        if ($res['new_groups']) $msg .= ' ' . __('Neue Gruppen: {list}.', ['list' => implode(', ', $res['new_groups'])]);
+        if ($r->str('invite') === '1') {
+            $msg .= ' ' . ($res['invited'] === 1 ? __('1 Einladung gesendet.') : __('{n} Einladungen gesendet.', ['n' => $res['invited']]));
+            if (($left = count(Repo::members('none'))) > 0) $msg .= ' ' . __('Noch {n} ohne Einladung – „Alle einladen“ erneut klicken.', ['n' => $left]);
+        }
+        $fails = array_merge($res['failed'], $res['invite_failed']);
+        return $this->to('/admin/mitglieder', $fails ? 'error' : 'success', $msg . ($fails ? ' ' . __('Nicht übernommen: {list}', ['list' => implode(', ', array_slice($fails, 0, 10))]) : ''));
+    }
+
     /** Höchstens so viele Einladungen je Klick (Versand dauert; der Rest mit dem nächsten Klick) */
     public const INVITE_BATCH = 40;
 
