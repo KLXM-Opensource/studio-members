@@ -34,7 +34,9 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
         $vars['user'] = app()->auth->user();
         $vars['counts'] = Repo::counts();
         $dir = dirname(__DIR__) . '/views/admin/';
-        $content = Theme::capture($dir . '_nav.php', $vars) . Theme::capture($dir . $view . '.php', $vars);
+        $GLOBALS['mb_shell'] = false;
+        $content = Theme::capture($dir . '_nav.php', $vars) . Theme::capture($dir . $view . '.php', $vars)
+            . (!empty($GLOBALS['mb_shell']) ? \Core\AdminUi::close() : '');   // Bereichsliste (Core\AdminUi) schließen
         $html = Theme::capture(ROOT . '/app/Admin/views/layout.php', $vars + ['content' => $content, 'view' => 'members', 'title' => $vars['title'] ?? __('Mitglieder')]);
         return self::secure(new Response($html, $status));
     }
