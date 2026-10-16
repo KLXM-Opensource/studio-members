@@ -436,7 +436,8 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
                 'help' => __('E-Mail-Adressen, durch Komma getrennt. Leer = Empfänger der Website (System → E-Mail-Versand).')],
         ];
         // Geschützte Pools der Mediathek: Freigabe je Gruppe (leer = alle aktiven Mitglieder)
-        $pools = array_filter(\Core\MediaPools::forSite(), fn($k) => \Core\MediaPools::isProtected((string) $k), ARRAY_FILTER_USE_KEY);
+        $pools = array_filter(\Core\MediaPools::forSite(), fn($k) => \Core\MediaPools::isProtected((string) $k)
+            && in_array((string) (\Core\MediaPools::meta((string) $k)['owner'] ?? ''), ['', Members::NAME], true), ARRAY_FILTER_USE_KEY);
         if ($pools) {
             $f[] = ['type' => 'heading', 'label' => __('Geschützte Dateien')];
             foreach ($pools as $key => $label) {

@@ -284,6 +284,9 @@ final class Members
     /** Core\MediaPools (geschützter Pool): angemeldet, aktiv und in einer freigegebenen Gruppe → ja; ohne Anmeldung → Anmeldeseite, sonst nein */
     public static function mediaAllowed(Request $r, array $ctx = []): bool|Response
     {
+        // Pools anderer Erweiterungen (pool.json 'owner', z. B. die Shootings der Bildauswahl) gehen den Mitgliederbereich nichts an
+        $owner = (string) (\Core\MediaPools::meta((string) ($ctx['pool'] ?? ''))['owner'] ?? '');
+        if ($owner !== '' && $owner !== Members::NAME) return false;
         if ($m = self::current()) {
             $need = self::poolGroups()[(string) ($ctx['pool'] ?? '')] ?? [];
             return self::allowed($m, implode(',', $need));

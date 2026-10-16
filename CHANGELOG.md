@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.7 – 2026-10-16
+
+- Geschützte Pools anderer Erweiterungen (`pool.json` `owner`, z. B. die Shootings der Bildauswahl) gehören nicht zum Mitgliederbereich: kein Zugriff für Mitglieder, nicht in den Einstellungen „Geschützte Dateien“.
+
 ## 0.1.6 – 2026-10-16
 
 - **Geschützte Dateien je Gruppe:** Mitglieder → Einstellungen → „Geschützte Dateien“: jeder geschützte Pool lässt sich auf Gruppen einschränken (bisher: alle angemeldeten Mitglieder).
