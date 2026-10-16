@@ -235,4 +235,8 @@ return [
     '„{table}“ ist nicht geschützt' => '“{table}” is not protected',
     'die Liste steht im geschützten Bereich ({pages}), die Einträge sind über ihre Detailseiten, die Suche und die Sitemap aber für alle erreichbar.' => 'the list is in the protected area ({pages}), but the entries are reachable for everyone via their detail pages, search and sitemap.',
     'Tabelle schützen (alle Mitglieder)' => 'Protect table (all members)',
+    'Geschützte Dateien' => 'Protected files',
+    'Pool „{name}“ freigegeben für' => 'Pool “{name}” available to',
+    'Keine Gruppe gewählt = alle angemeldeten Mitglieder. Dateien eines Pools sind über ihre Adresse erreichbar, unabhängig davon, auf welcher Seite sie verlinkt sind – für Dateien einzelner Gruppen einen eigenen Pool anlegen.' => 'No group selected = all signed-in members. Files in a pool can be reached by their address regardless of the page they are linked on – create a separate pool for files meant for specific groups.',
+    'Die E-Mail-Adresse eines Mitglieds kann nur ändern, wer Mitglieder verwalten darf.' => 'Only people allowed to manage members can change a member’s email address.',
 ];

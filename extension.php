@@ -26,7 +26,7 @@ use Klxm\Members\SiteController;
 return [
     'name' => 'members',
     'label' => 'Mitgliederbereich – geschützte Seiten und Dateien',
-    'version' => '0.1.5',
+    'version' => '0.1.6',
     'requires' => '>=1.0.0',
     'description' => 'Geschützte Seiten und Datentabellen mit Anmeldung (Passwort, Passkey, Anmelde-Link), Gruppen, Einladungen und Anträgen; Mitgliederprofile; geschützte Medien.',
     'author' => 'KLXM Crossmedia GmbH and contributors',
@@ -79,13 +79,26 @@ return [
             if (Klxm\Members\Profiles::isTable($table)) Repo::removeAccess($id);
         });
         $x->on('entry.saved', function (array $table, array $entry, bool $created, ?array $old): void {
-            if (Klxm\Members\Profiles::isTable($table) && $old && mb_strtolower((string) ($old['email'] ?? '')) !== mb_strtolower((string) ($entry['email'] ?? ''))) {
-                Repo::bumpAuth((int) $entry['id']);
+            if (!Klxm\Members\Profiles::isTable($table) || !$old) return;
+            $was = mb_strtolower((string) ($old['email'] ?? ''));
+            if ($was === mb_strtolower((string) ($entry['email'] ?? ''))) return;
+            $id = (int) $entry['id'];
+            // Die E-Mail ist die Anmeldung: ändern dürfen sie in der Verwaltung nur Personen mit Recht „Mitglieder verwalten“
+            // (sonst könnte, wer nur die Tabelle bearbeitet, die eigene Adresse eintragen und sich per Link anmelden)
+            if (app()->auth->user() && !can(Members::PERM) && Repo::member($id)) {
+                \Core\Data\Tables::db($table)->update($table['table'], ['email' => (string) $old['email']], 'id = :id', ['id' => $id]);
+                app()->session->flash('error', __('Die E-Mail-Adresse eines Mitglieds kann nur ändern, wer Mitglieder verwalten darf.'));
+                return;
+            }
+            Repo::bumpAuth($id);
+            // Hinweis an die bisherige Adresse
+            if ($was !== '' && ($m = Repo::member($id)) && $m['status'] !== 'none') {
+                try { Klxm\Members\Mail::credentialsChanged(['email' => $was] + $m, lt('E-Mail-Adresse')); } catch (\Throwable $e) { error_log('[members] ' . $e->getMessage()); }
             }
         });
 
-        // Geschützte Pools der Mediathek (Core\MediaPools): angemeldete Mitglieder dürfen die Dateien abrufen
-        $x->mediaAccess(fn(array $ctx, Core\Http\Request $r) => Members::mediaAllowed($r));
+        // Geschützte Pools der Mediathek (Core\MediaPools): angemeldete Mitglieder der freigegebenen Gruppen dürfen die Dateien abrufen
+        $x->mediaAccess(fn(array $ctx, Core\Http\Request $r) => Members::mediaAllowed($r, $ctx));
 
         $x->adminPage(['href' => '/admin/mitglieder', 'label' => 'Mitglieder', 'kind' => 'content', 'icon' => 'users', 'perm' => Members::PERM,
             'feature' => Members::FEATURE, 'description' => 'Mitglieder einladen, Anträge freischalten, Seiten und Dateien schützen']);

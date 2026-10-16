@@ -97,7 +97,7 @@ final class SiteController
         if (!$this->csrf($r)) return $this->login($r, ['_' => lt('Die Sitzung ist abgelaufen. Bitte erneut versuchen.')], '', 419);
         $email = mb_strtolower(trim($r->str('email')));
         $pw = (string) ($r->post['password'] ?? '');
-        if ($this->limited('login', $this->ipKey($r), 8, 900) || ($email !== '' && $this->limited('login-mail', $email, 10, 3600))) {
+        if ($this->limited('login', $this->ipKey($r), 8, 900) || ($email !== '' && ($this->limited('login-mail', $email . '|' . $this->ipKey($r), 10, 3600) || $this->limited('login-mail-all', $email, 100, 3600)))) {
             return $this->login($r, ['_' => lt('Zu viele Anmeldeversuche. Bitte warten Sie 15 Minuten.')], $email, 429);
         }
         $m = $email !== '' ? Repo::memberByEmail($email) : null;

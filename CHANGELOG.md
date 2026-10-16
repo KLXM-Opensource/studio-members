@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6 – 2026-10-16
+
+- **Geschützte Dateien je Gruppe:** Mitglieder → Einstellungen → „Geschützte Dateien“: jeder geschützte Pool lässt sich auf Gruppen einschränken (bisher: alle angemeldeten Mitglieder).
+- Sicherheit: Die E-Mail-Adresse eines Mitglieds (seine Anmeldung) ändert in der Verwaltung nur, wer „Mitglieder verwalten“ darf; die bisherige Adresse bekommt einen Hinweis.
+- Sicherheit: Die Sperre nach falschen Passwörtern gilt je Adresse und Anschluss (10 je Stunde) – Fremde können ein Mitglied nicht mehr mit wenigen Versuchen aussperren; insgesamt höchstens 100 je Adresse und Stunde.
+
 ## 0.1.5 – 2026-10-14
 
 - **Mitglieder importieren (CSV):** Mitglieder → „Mitglieder importieren (CSV)“ mit Vorlage zum Herunterladen (E-Mail, Name, Gruppen, Profilfelder; Semikolon, UTF-8 für Excel). Vorhandene Listen funktionieren auch – Spalten werden an der Überschrift erkannt (E-Mail, Name oder Vorname/Nachname, Gruppen, Profilfelder nach Bezeichnung oder Kurzname); Trennzeichen ; , oder Tab, UTF-8 oder Windows-1252. Erst eine **Vorschau** (neu, vorhanden, ungültig, doppelt), dann übernehmen: vorhandene ergänzen oder überspringen, unbekannte Gruppen anlegen, neue gleich einladen (höchstens 40 je Schritt, Rest über „Alle einladen“). Ohne Einladung entstehen sie „ohne Zugang“. Höchstens 2000 Zeilen bzw. 2 MB je Datei.

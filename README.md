@@ -26,7 +26,7 @@ Aktivieren je Website unter **Administration → Funktionen & Erweiterungen** od
 | Profile | Datentabelle „Mitglieder“ (Name, E-Mail, Kurze Vita, optional Website, LinkedIn, Instagram, Facebook, Mastodon, Bluesky + eigene Felder) – eine Datenbasis, Import/Export unter Daten. Mitglieder pflegen ihr Profil unter „Mein Konto“ und wählen je Feld: **öffentlich**, **nur Mitglieder**, **nur Redaktion**. Zugangsdaten (Status, Passwort-Hash, Passkeys, Tokens) liegen getrennt und nie in Export, API, MCP oder Listen. |
 | Profilfoto | quadratisch, ohne Metadaten, nur für Angemeldete sichtbar. |
 | Zugangsdaten ändern | Passwort/Passkeys erst nach Bestätigung (Passwort, Passkey oder E-Mail-Link, 10 Min.); Hinweis-Mail nach jeder Änderung, andere Geräte werden abgemeldet. |
-| Geschützte Medien | Geschützter Pool der Mediathek (Grundeinstellungen → Geteilte Medien → „Geschützt“): Dateien nur für angemeldete Mitglieder. |
+| Geschützte Medien | Geschützter Pool der Mediathek (Grundeinstellungen → Geteilte Medien → „Geschützt“): Dateien nur für angemeldete Mitglieder – je Pool auf Gruppen einschränkbar (Mitglieder → Einstellungen → „Geschützte Dateien“). Dateien sind über ihre Adresse erreichbar, unabhängig von der Seite, auf der sie verlinkt sind: für einzelne Gruppen einen eigenen Pool anlegen. |
 | Mehrsprachig | Sprache per `?lang=`, Texte der Einstellungen je Sprache, E-Mails in der Sprache des Mitglieds. |
 
 ## Sicherheit

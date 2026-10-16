@@ -274,10 +274,20 @@ final class Members
         return (new SiteController())->message(lt('Kein Zugriff'), lt('Dieser Bereich ist für Ihr Konto nicht freigegeben. Bitte wenden Sie sich an die Betreiber der Website.'), 403);
     }
 
-    /** Core\MediaPools (geschützter Pool): angemeldet und aktiv → ja; direkter Aufruf ohne Anmeldung → Anmeldeseite, sonst nein */
-    public static function mediaAllowed(Request $r): bool|Response
+    /** Freigabe geschützter Pools je Gruppe [pool => [Gruppen-IDs]] (Einstellungen; fehlt ein Pool: alle Mitglieder) */
+    public static function poolGroups(): array
     {
-        if (self::current()) return true;
+        $v = json_decode((string) app()->settings->get('members.pool_groups', ''), true);
+        return is_array($v) ? array_map(fn($ids) => array_map('intval', (array) $ids), $v) : [];
+    }
+
+    /** Core\MediaPools (geschützter Pool): angemeldet, aktiv und in einer freigegebenen Gruppe → ja; ohne Anmeldung → Anmeldeseite, sonst nein */
+    public static function mediaAllowed(Request $r, array $ctx = []): bool|Response
+    {
+        if ($m = self::current()) {
+            $need = self::poolGroups()[(string) ($ctx['pool'] ?? '')] ?? [];
+            return self::allowed($m, implode(',', $need));
+        }
         $nav = ($r->server['HTTP_SEC_FETCH_DEST'] ?? '') === 'document' || str_contains((string) ($r->server['HTTP_ACCEPT'] ?? ''), 'text/html');
         return $nav ? Response::redirect(self::url('anmelden', ['ziel' => '/' . ltrim($r->path, '/')]), 302) : false;
     }

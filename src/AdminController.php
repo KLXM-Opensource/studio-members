@@ -435,6 +435,15 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
             ['name' => 'notify', 'label' => __('Hinweis auf neue Anträge an'), 'type' => 'text', 'max' => 400, 'show_if' => ['apply' => true],
                 'help' => __('E-Mail-Adressen, durch Komma getrennt. Leer = Empfänger der Website (System → E-Mail-Versand).')],
         ];
+        // Geschützte Pools der Mediathek: Freigabe je Gruppe (leer = alle aktiven Mitglieder)
+        $pools = array_filter(\Core\MediaPools::forSite(), fn($k) => \Core\MediaPools::isProtected((string) $k), ARRAY_FILTER_USE_KEY);
+        if ($pools) {
+            $f[] = ['type' => 'heading', 'label' => __('Geschützte Dateien')];
+            foreach ($pools as $key => $label) {
+                $f[] = ['name' => 'pool_' . $key, 'label' => __('Pool „{name}“ freigegeben für', ['name' => $label]), 'type' => 'multiselect', 'options' => self::groupOptions(),
+                    'help' => __('Keine Gruppe gewählt = alle angemeldeten Mitglieder. Dateien eines Pools sind über ihre Adresse erreichbar, unabhängig davon, auf welcher Seite sie verlinkt sind – für Dateien einzelner Gruppen einen eigenen Pool anlegen.')];
+            }
+        }
         foreach (self::otherLangs() as $code => $name) {
             $f[] = ['type' => 'heading', 'label' => __('Texte auf {lang}', ['lang' => $name])];
             $f[] = ['name' => 'intro_' . $code, 'label' => __('Text auf der Anmeldeseite'), 'type' => 'textarea', 'max' => 600, 'help' => __('Leer = Text der Standardsprache.')];
@@ -453,6 +462,7 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
             $values = ['intro' => (string) $s->get('members.intro', ''), 'apply_text' => (string) $s->get('members.apply_text', ''),
                 'notify' => (string) $s->get('members.notify', ''), 'magic' => (bool) $s->get('members.magic', true), 'apply' => (bool) $s->get('members.apply', false),
                 'home' => ($h = (int) $s->get('members.home', 0)) ? 'page:' . $h : ''];
+            foreach (Members::poolGroups() as $key => $ids) $values['pool_' . $key] = array_map('strval', $ids);
             // Einladung: gespeicherte Vorlage, sonst der Standardtext zum Ansehen und Anpassen
             [$values['invite_subject'], $values['invite_text']] = Mail::inviteTemplate(null);
             foreach (array_keys(self::otherLangs()) as $code) {
@@ -484,6 +494,9 @@ final class AdminController extends \Core\Http\Controllers\Admin\AdminController
         $s->set('members.apply', !empty($v['apply']));
         $s->set('members.apply_text', (string) ($v['apply_text'] ?? ''));
         $s->set('members.notify', (string) ($v['notify'] ?? ''));
+        $pg = [];
+        foreach ($v as $k => $ids) if (str_starts_with((string) $k, 'pool_') && is_array($ids) && $ids) $pg[substr((string) $k, 5)] = array_map('intval', $ids);
+        $s->set('members.pool_groups', json_encode($pg));
         Mail::saveInviteTemplate(null, (string) ($v['invite_subject'] ?? ''), (string) ($v['invite_text'] ?? ''));
         foreach (array_keys(self::otherLangs()) as $code) {
             $s->set("members.intro.$code", (string) ($v['intro_' . $code] ?? ''));
